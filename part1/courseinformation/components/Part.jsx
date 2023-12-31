@@ -1,9 +1,9 @@
-function Part({ part, exercises }) {
+const Part = ({ part, exercises }) => {
 	return (
 		<p>
 			{part} {exercises}
 		</p>
 	);
-}
+};
 
 export default Part;
