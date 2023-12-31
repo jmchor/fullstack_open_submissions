@@ -1,19 +1,39 @@
 import { useState } from 'react';
 
-const Statistics = ({ text, statistic }) => {
+const Statistics = ({ good, neutral, bad, all }) => {
+	const average = (good - bad) / all;
+	const positive = (good / all) * 100;
+
+	return (
+		<div>
+			<StatisticLine text='good' value={good} />
+			<StatisticLine text='neutral' value={neutral} />
+			<StatisticLine text='bad' value={bad} />
+			<StatisticLine text='all' value={all} />
+			<StatisticLine text='average' value={average} />
+			<StatisticLine text='positive' value={positive} />
+		</div>
+	);
+};
+
+const StatisticLine = ({ text, value }) => {
 	return (
 		<div>
 			{text === 'positive' ? (
 				<p>
-					{text} {statistic} %
+					{text} {value} %
 				</p>
 			) : (
 				<p>
-					{text} {statistic}
+					{text} {value}
 				</p>
 			)}
 		</div>
 	);
+};
+
+const Button = ({ increaseCounter, text }) => {
+	return <button onClick={increaseCounter}>{text}</button>;
 };
 
 const App = () => {
@@ -21,39 +41,20 @@ const App = () => {
 	const [good, setGood] = useState(0);
 	const [neutral, setNeutral] = useState(0);
 	const [bad, setBad] = useState(0);
-	const [all, setAll] = useState(0);
 
-	const increaseCounter = (feedback) => {
-		setAll(all + 1);
-		if (feedback === 'good') {
-			setGood(good + 1);
-		} else if (feedback === 'neutral') {
-			setNeutral(neutral + 1);
-		} else {
-			setBad(bad + 1);
-		}
-	};
-
-	const average = (good - bad) / all;
-	const positive = (good / all) * 100;
-
+	const all = good + neutral + bad;
 	return (
 		<div>
 			<h1>give feedback</h1>
 
-			<button onClick={() => increaseCounter('good')}>good</button>
-			<button onClick={() => increaseCounter('neutral')}>neutral</button>
-			<button onClick={() => increaseCounter('bad')}>bad</button>
+			<Button increaseCounter={() => setGood(good + 1)} text={'good'} />
+			<Button increaseCounter={() => setNeutral(neutral + 1)} text={'neutral'} />
+			<Button increaseCounter={() => setBad(bad + 1)} text={'bad'} />
 
 			<h1>statistics</h1>
 			{all > 0 ? (
 				<>
-					<Statistics text={'good'} statistic={good} />
-					<Statistics text={'neutral'} statistic={neutral} />
-					<Statistics text={'bad'} statistic={bad} />
-					<Statistics text={'all'} statistic={all} />
-					<Statistics text={'average'} statistic={average} />
-					<Statistics text={'positive'} statistic={positive} />
+					<Statistics good={good} neutral={neutral} bad={bad} all={all} />
 				</>
 			) : (
 				<p>No feedback given</p>
