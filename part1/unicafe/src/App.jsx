@@ -5,30 +5,25 @@ const Statistics = ({ good, neutral, bad, all }) => {
 	const positive = (good / all) * 100;
 
 	return (
-		<div>
-			<StatisticLine text='good' value={good} />
-			<StatisticLine text='neutral' value={neutral} />
-			<StatisticLine text='bad' value={bad} />
-			<StatisticLine text='all' value={all} />
-			<StatisticLine text='average' value={average} />
-			<StatisticLine text='positive' value={positive} />
-		</div>
+		<table>
+			<tbody>
+				<StatisticLine text='good' value={good} />
+				<StatisticLine text='neutral' value={neutral} />
+				<StatisticLine text='bad' value={bad} />
+				<StatisticLine text='all' value={all} />
+				<StatisticLine text='average' value={average} />
+				<StatisticLine text='positive' value={positive} />
+			</tbody>
+		</table>
 	);
 };
 
 const StatisticLine = ({ text, value }) => {
 	return (
-		<div>
-			{text === 'positive' ? (
-				<p>
-					{text} {value} %
-				</p>
-			) : (
-				<p>
-					{text} {value}
-				</p>
-			)}
-		</div>
+		<tr>
+			<td>{text}</td>
+			<td>{text === 'positive' ? `${value} %` : value}</td>
+		</tr>
 	);
 };
 
