@@ -46,12 +46,18 @@ const App = () => {
 			<button onClick={() => increaseCounter('bad')}>bad</button>
 
 			<h1>statistics</h1>
-			<Statistics text={'good'} statistic={good} />
-			<Statistics text={'neutral'} statistic={neutral} />
-			<Statistics text={'bad'} statistic={bad} />
-			<Statistics text={'all'} statistic={all} />
-			<Statistics text={'average'} statistic={average} />
-			<Statistics text={'positive'} statistic={positive} />
+			{all > 0 ? (
+				<>
+					<Statistics text={'good'} statistic={good} />
+					<Statistics text={'neutral'} statistic={neutral} />
+					<Statistics text={'bad'} statistic={bad} />
+					<Statistics text={'all'} statistic={all} />
+					<Statistics text={'average'} statistic={average} />
+					<Statistics text={'positive'} statistic={positive} />
+				</>
+			) : (
+				<p>No feedback given</p>
+			)}
 		</div>
 	);
 };
