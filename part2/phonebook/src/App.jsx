@@ -1,9 +1,19 @@
 import { useState } from 'react';
+import Form from './components/Form';
+import SearchFilter from './components/SearchFilter';
+import Contacts from './components/Contacts';
 
 const App = () => {
-	const [persons, setPersons] = useState([{ name: 'Arto Hellas', number: '040-1234567' }]);
+	const [persons, setPersons] = useState([
+		{ name: 'Arto Hellas', number: '040-123456', id: 1 },
+		{ name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
+		{ name: 'Dan Abramov', number: '12-43-234345', id: 3 },
+		{ name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 },
+	]);
+
 	const [newName, setNewName] = useState('');
 	const [newNumber, setNewNumber] = useState('');
+	const [filterValue, setFilterValue] = useState('');
 
 	const handleChange = (e) => {
 		setNewName(e.target.value);
@@ -11,6 +21,13 @@ const App = () => {
 	const handleNumberChange = (e) => {
 		setNewNumber(e.target.value);
 	};
+
+	const handleFilterChange = (e) => {
+		const value = e.target.value.toLowerCase();
+		setFilterValue(value);
+	};
+
+	const filterPersons = persons.filter((person) => person.name.toLowerCase().includes(filterValue));
 
 	const updatePersons = (e) => {
 		e.preventDefault();
@@ -28,22 +45,17 @@ const App = () => {
 	return (
 		<div>
 			<h2>Phonebook</h2>
-			<form onSubmit={updatePersons}>
-				<div>
-					name: <input value={newName} onChange={handleChange} />
-					number: <input value={newNumber} onChange={handleNumberChange} />
-				</div>
-				<div>
-					<button type='submit'>add</button>
-				</div>
-			</form>
+			<SearchFilter filterValue={filterValue} handleFilterChange={handleFilterChange} />
+			<h2>add a new</h2>
+			<Form
+				updatePersons={updatePersons}
+				newName={newName}
+				newNumber={newNumber}
+				handleChange={handleChange}
+				handleNumberChange={handleNumberChange}
+			/>
 			<h2>Numbers</h2>
-			{persons.map((person) => (
-				<p key={person.name}>
-					{person.name} {person.number}
-				</p>
-			))}
-			...
+			<Contacts filterPersons={filterPersons} />
 		</div>
 	);
 };
