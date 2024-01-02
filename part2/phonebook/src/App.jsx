@@ -1,0 +1,44 @@
+import { useState } from 'react';
+
+const App = () => {
+	const [persons, setPersons] = useState([{ name: 'Arto Hellas' }]);
+	const [newName, setNewName] = useState('');
+
+	const handleChange = (e) => {
+		setNewName(e.target.value);
+	};
+
+	const updatePersons = (e) => {
+		e.preventDefault();
+		const newPerson = { name: newName };
+
+		if (!persons.some((person) => person.name === newPerson.name)) {
+			const newArray = [...persons, newPerson];
+			setPersons(newArray);
+		} else {
+			window.alert(`${newName} is already added in the phonebook`);
+		}
+		setNewName('');
+	};
+
+	return (
+		<div>
+			<h2>Phonebook</h2>
+			<form onSubmit={updatePersons}>
+				<div>
+					name: <input value={newName} onChange={handleChange} />
+				</div>
+				<div>
+					<button type='submit'>add</button>
+				</div>
+			</form>
+			<h2>Numbers</h2>
+			{persons.map((person) => (
+				<p key={person.name}>{person.name}</p>
+			))}
+			...
+		</div>
+	);
+};
+
+export default App;
