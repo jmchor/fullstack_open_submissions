@@ -1,19 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Form from './components/Form';
 import SearchFilter from './components/SearchFilter';
 import Contacts from './components/Contacts';
+import axios from 'redaxios';
+import contactService from './services/phonebook';
+const server = 'http://localhost:3001';
 
 const App = () => {
-	const [persons, setPersons] = useState([
-		{ name: 'Arto Hellas', number: '040-123456', id: 1 },
-		{ name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-		{ name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-		{ name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 },
-	]);
-
+	const [persons, setPersons] = useState([]);
 	const [newName, setNewName] = useState('');
 	const [newNumber, setNewNumber] = useState('');
 	const [filterValue, setFilterValue] = useState('');
+
+	useEffect(() => {
+		contactService.getAll().then((response) => {
+			setPersons(response.data);
+		});
+	}, [persons]);
 
 	const handleChange = (e) => {
 		setNewName(e.target.value);
@@ -38,8 +41,23 @@ const App = () => {
 		} else {
 			window.alert(`${newName} is already added in the phonebook`);
 		}
+
+		contactService
+			.create(newPerson)
+			.then((res) => console.log(`Successfully added ${res.data.name} to the datbase`))
+			.catch((error) => console.error('Error!', error));
+
 		setNewName('');
 		setNewNumber('');
+	};
+
+	const deleteContact = (id, name) => {
+		if (window.confirm(`Delete ${name}?`)) {
+			contactService
+				.deletePerson(id)
+				.then((res) => console.log(`Successfully deleted ${name} from database`))
+				.catch((error) => console.log(error));
+		}
 	};
 
 	return (
@@ -55,7 +73,7 @@ const App = () => {
 				handleNumberChange={handleNumberChange}
 			/>
 			<h2>Numbers</h2>
-			<Contacts filterPersons={filterPersons} />
+			<Contacts filterPersons={filterPersons} deleteContact={deleteContact} />
 		</div>
 	);
 };
