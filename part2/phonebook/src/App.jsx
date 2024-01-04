@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Form from './components/Form';
 import SearchFilter from './components/SearchFilter';
 import Contacts from './components/Contacts';
-import axios from 'redaxios';
 import contactService from './services/phonebook';
 const server = 'http://localhost:3001';
 
@@ -11,12 +10,29 @@ const App = () => {
 	const [newName, setNewName] = useState('');
 	const [newNumber, setNewNumber] = useState('');
 	const [filterValue, setFilterValue] = useState('');
+	const [successMessage, setSuccessMessage] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
+
+	const successStyle = {
+		color: 'green',
+		border: '2px solid green',
+		borderRadius: '5px',
+		background: 'lightgrey',
+		padding: '10px',
+	};
+	const errorStyle = {
+		color: 'red',
+		border: '2px solid red',
+		borderRadius: '5px',
+		background: 'lightgrey',
+		padding: '10px',
+	};
 
 	useEffect(() => {
 		contactService.getAll().then((response) => {
 			setPersons(response.data);
 		});
-	}, [persons]);
+	}, []);
 
 	const handleChange = (e) => {
 		setNewName(e.target.value);
@@ -35,27 +51,52 @@ const App = () => {
 	const updatePersons = (e) => {
 		e.preventDefault();
 		const newPerson = { name: newName, number: newNumber };
+		const updateNumberPerson = persons.find(
+			(person) => person.name === newPerson.name && person.number !== newPerson.number
+		);
+
 		if (!persons.some((person) => person.name === newPerson.name)) {
-			const newArray = [...persons, newPerson];
-			setPersons(newArray);
+			setPersons((prevPersons) => [...prevPersons, newPerson]);
+			contactService
+				.create(newPerson)
+				.then((res) => {
+					setSuccessMessage(`Added ${res.data.name}`);
+					setNewName('');
+					setNewNumber('');
+					setTimeout(() => {
+						setSuccessMessage('');
+					}, 3000);
+				})
+				.catch((error) => console.error('Error!', error));
+		} else if (updateNumberPerson) {
+			contactService
+				.update(updateNumberPerson.id, { ...updateNumberPerson, number: newNumber })
+				.then((res) => {
+					console.log(`Successfully updated ${res.data.name}'s number on the server`);
+
+					setPersons((prevPersons) => prevPersons.map((person) => (person.id === res.data.id ? res.data : person)));
+
+					alert(`Successfully updated ${newPerson.name}'s number`);
+					setNewName('');
+					setNewNumber('');
+				})
+				.catch((error) => {
+					console.error('Error updating number on the server!', error);
+					setErrorMessage(`Information of ${updateNumberPerson.name} has already been removed from server`);
+				});
 		} else {
 			window.alert(`${newName} is already added in the phonebook`);
 		}
-
-		contactService
-			.create(newPerson)
-			.then((res) => console.log(`Successfully added ${res.data.name} to the datbase`))
-			.catch((error) => console.error('Error!', error));
-
-		setNewName('');
-		setNewNumber('');
 	};
 
 	const deleteContact = (id, name) => {
 		if (window.confirm(`Delete ${name}?`)) {
 			contactService
 				.deletePerson(id)
-				.then((res) => console.log(`Successfully deleted ${name} from database`))
+				.then(() => {
+					console.log(`Successfully deleted ${name} from database`);
+					setPersons((prevPersons) => prevPersons.filter((person) => person.id !== id));
+				})
 				.catch((error) => console.log(error));
 		}
 	};
@@ -63,6 +104,8 @@ const App = () => {
 	return (
 		<div>
 			<h2>Phonebook</h2>
+			{successMessage && <div style={successStyle}>{successMessage}</div>}
+			{errorMessage && <div style={errorStyle}>{errorMessage}</div>}
 			<SearchFilter filterValue={filterValue} handleFilterChange={handleFilterChange} />
 			<h2>add a new</h2>
 			<Form

@@ -5,7 +5,7 @@ const Contacts = ({ filterPersons, deleteContact }) => {
 		<>
 			{filterPersons?.map((person) => (
 				<Details
-					key={person.name}
+					key={person.id}
 					name={person.name}
 					number={person.number}
 					id={person.id}
