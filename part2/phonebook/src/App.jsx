@@ -3,7 +3,6 @@ import Form from './components/Form';
 import SearchFilter from './components/SearchFilter';
 import Contacts from './components/Contacts';
 import contactService from './services/phonebook';
-const server = 'http://localhost:3001';
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
