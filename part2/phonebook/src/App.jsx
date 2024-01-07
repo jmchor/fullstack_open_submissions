@@ -55,10 +55,11 @@ const App = () => {
 		);
 
 		if (!persons.some((person) => person.name === newPerson.name)) {
-			setPersons((prevPersons) => [...prevPersons, newPerson]);
 			contactService
 				.create(newPerson)
 				.then((res) => {
+					setPersons((prevPersons) => [...prevPersons, newPerson]);
+					console.log(res.data);
 					setSuccessMessage(`Added ${res.data.name}`);
 					setNewName('');
 					setNewNumber('');
@@ -66,7 +67,10 @@ const App = () => {
 						setSuccessMessage('');
 					}, 3000);
 				})
-				.catch((error) => console.error('Error!', error));
+				.catch((error) => {
+					console.error('Error!', error);
+					setErrorMessage(error.response.data.error);
+				});
 		} else if (updateNumberPerson) {
 			contactService
 				.update(updateNumberPerson.id, { ...updateNumberPerson, number: newNumber })
@@ -75,7 +79,7 @@ const App = () => {
 
 					setPersons((prevPersons) => prevPersons.map((person) => (person.id === res.data.id ? res.data : person)));
 
-					alert(`Successfully updated ${newPerson.name}'s number`);
+					setSuccessMessage(`Successfully updated ${newPerson.name}'s number`);
 					setNewName('');
 					setNewNumber('');
 				})
@@ -94,6 +98,7 @@ const App = () => {
 				.deletePerson(id)
 				.then(() => {
 					console.log(`Successfully deleted ${name} from database`);
+					setSuccessMessage(`Successfully deleted ${name} from database`);
 					setPersons((prevPersons) => prevPersons.filter((person) => person.id !== id));
 				})
 				.catch((error) => console.log(error));
