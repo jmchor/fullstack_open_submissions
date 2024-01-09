@@ -8,7 +8,7 @@ const api = supertest(app);
 
 const helper = require('./test_helper');
 
-describe('when there is initially one user in db', () => {
+describe('User creation with valid format', () => {
 	beforeEach(async () => {
 		await User.deleteMany({});
 
@@ -56,6 +56,25 @@ describe('when there is initially one user in db', () => {
 			.expect('Content-Type', /application\/json/);
 
 		expect(result.body.error).toContain('expected `username` to be unique');
+
+		const usersAtEnd = await helper.usersInDb();
+		expect(usersAtEnd).toEqual(usersAtStart);
+	});
+
+	test('creation fails with invalid username or password', async () => {
+		const usersAtStart = await helper.usersInDb();
+
+		const newUser = {
+			username: 'dj',
+			name: 'Member',
+			password: 'ra',
+		};
+
+		await api
+			.post('/api/users')
+			.send(newUser)
+			.expect(400)
+			.expect('Content-Type', /application\/json/);
 
 		const usersAtEnd = await helper.usersInDb();
 		expect(usersAtEnd).toEqual(usersAtStart);
