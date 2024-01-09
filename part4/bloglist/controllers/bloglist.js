@@ -3,15 +3,6 @@ const Blog = require('../models/blog');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
-// const getTokenFrom = (request) => {
-// 	const authorization = request.get('authorization');
-// 	if (authorization && authorization.startsWith('Bearer ')) {
-// 		request.token = authorization.replace('Bearer ', '');
-// 	} else {
-// 		request.token = null;
-// 	}
-// };
-
 blogRouter.get('/', async (req, res) => {
 	const foundBlogs = await Blog.find({}).populate('user');
 	res.json(foundBlogs);
@@ -26,13 +17,7 @@ blogRouter.get('/:id', async (req, res) => {
 blogRouter.post('/', async (req, res) => {
 	let { title, author, url, likes } = req.body;
 
-	console.log(req.token);
-
-	const decodedToken = jwt.verify(req.token, process.env.SECRET);
-	if (!decodedToken.id) {
-		return res.status(401).json({ error: 'token invalid' });
-	}
-	const user = await User.findById(decodedToken.id);
+	const user = req.user;
 
 	if (!likes) {
 		likes = 0;
@@ -68,9 +53,21 @@ blogRouter.put('/:id', async (req, res) => {
 
 blogRouter.delete('/:id', async (req, res) => {
 	const { id } = req.params;
+	const user = req.user;
 
-	await Blog.findByIdAndDelete(id);
-	res.status(204).end();
+	const blog = await Blog.findById(id);
+
+	console.log('BLOG USER', blog.user.toString());
+	console.log('LOGGED IN USER', user.id);
+
+	if (blog.user.toString() === user.id.toString()) {
+		await Blog.findByIdAndDelete(id);
+		res.status(204).end();
+	} else {
+		// eslint-disable-next-line quotes
+		console.log(`You're not the creator, you don't delete nothin' around here.`);
+		res.status(400).end();
+	}
 });
 
 module.exports = blogRouter;
