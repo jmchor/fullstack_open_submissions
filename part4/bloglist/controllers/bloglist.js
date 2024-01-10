@@ -1,12 +1,12 @@
 const blogRouter = require('express').Router();
 const Blog = require('../models/blog');
-const User = require('../models/user');
-const jwt = require('jsonwebtoken');
+const { userExtractor, tokenExtractor } = require('../utils/middleware');
 
 blogRouter.get('/', async (req, res) => {
 	const foundBlogs = await Blog.find({}).populate('user');
 	res.json(foundBlogs);
 });
+
 blogRouter.get('/:id', async (req, res) => {
 	const { id } = req.params;
 
@@ -14,7 +14,7 @@ blogRouter.get('/:id', async (req, res) => {
 	res.status(200).json(foundBlog).end();
 });
 
-blogRouter.post('/', async (req, res) => {
+blogRouter.post('/', tokenExtractor, userExtractor, async (req, res) => {
 	let { title, author, url, likes } = req.body;
 
 	const user = req.user;
@@ -27,6 +27,10 @@ blogRouter.post('/', async (req, res) => {
 		res.status(400);
 	}
 
+	if (!req.token) {
+		res.status(401);
+	}
+
 	const blog = new Blog({
 		title,
 		author,
@@ -36,13 +40,12 @@ blogRouter.post('/', async (req, res) => {
 	});
 
 	const savedBlog = await blog.save();
-	console.log(user.blogs);
 	user.blogs = user.blogs.concat(savedBlog.id);
 	await user.save();
 	res.status(201).json(savedBlog);
 });
 
-blogRouter.put('/:id', async (req, res) => {
+blogRouter.put('/:id', tokenExtractor, async (req, res) => {
 	const { title, author, url, likes } = req.body;
 	const { id } = req.params;
 
@@ -51,7 +54,7 @@ blogRouter.put('/:id', async (req, res) => {
 	res.status(200).json(blogToUpdate);
 });
 
-blogRouter.delete('/:id', async (req, res) => {
+blogRouter.delete('/:id', tokenExtractor, userExtractor, async (req, res) => {
 	const { id } = req.params;
 	const user = req.user;
 
