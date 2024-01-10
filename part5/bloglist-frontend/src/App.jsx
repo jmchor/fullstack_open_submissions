@@ -44,6 +44,11 @@ const App = () => {
 		console.log('logging in with', username, password);
 	};
 
+	const handleLogout = () => {
+		window.localStorage.removeItem('loggedInBlogAppUser');
+		setUser('');
+	};
+
 	return (
 		<div>
 			<h2>blogs</h2>
@@ -74,6 +79,9 @@ const App = () => {
 			) : (
 				<div>
 					<p>{user.username} logged in</p>
+					<button type='button' onClick={handleLogout}>
+						Log Out
+					</button>
 				</div>
 			)}
 			{blogs.map((blog) => (
