@@ -42,6 +42,7 @@ blogRouter.post('/', tokenExtractor, userExtractor, async (req, res) => {
 	const savedBlog = await blog.save();
 	user.blogs = user.blogs.concat(savedBlog.id);
 	await user.save();
+	await savedBlog.populate('user');
 	res.status(201).json(savedBlog);
 });
 
@@ -59,9 +60,6 @@ blogRouter.delete('/:id', tokenExtractor, userExtractor, async (req, res) => {
 	const user = req.user;
 
 	const blog = await Blog.findById(id);
-
-	console.log('BLOG USER', blog.user.toString());
-	console.log('LOGGED IN USER', user.id);
 
 	if (blog.user.toString() === user.id.toString()) {
 		await Blog.findByIdAndDelete(id);
