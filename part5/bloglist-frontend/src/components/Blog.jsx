@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import blogService from '../services/blogs';
+import PropTypes from 'prop-types';
 
 const Blog = ({ blog, updateLikes, updateBlogsAfterDeletion, user }) => {
 	const [isBlogShown, setIsBlogShown] = useState(false);
@@ -54,7 +55,9 @@ const Blog = ({ blog, updateLikes, updateBlogsAfterDeletion, user }) => {
 
 	return (
 		<div style={blogStyle}>
-			"{blog.title}" by {blog.author}
+			<p>
+				‚{blog.title} by {blog.author}
+			</p>
 			<button type='button' onClick={toggleBlog}>
 				{isBlogShown ? 'Hide' : 'Show'}
 			</button>
@@ -80,3 +83,25 @@ const Blog = ({ blog, updateLikes, updateBlogsAfterDeletion, user }) => {
 };
 
 export default Blog;
+
+Blog.propTypes = {
+	blog: PropTypes.shape({
+		title: PropTypes.string.isRequired,
+		author: PropTypes.string.isRequired,
+		url: PropTypes.string,
+		likes: PropTypes.number,
+		user: PropTypes.shape({
+			username: PropTypes.string.isRequired,
+			name: PropTypes.string.isRequired,
+			blogs: PropTypes.array.isRequired,
+			id: PropTypes.string.isRequired,
+		}),
+	}).isRequired,
+	updateLikes: PropTypes.func.isRequired,
+	updateBlogsAfterDeletion: PropTypes.func.isRequired,
+	user: PropTypes.shape({
+		name: PropTypes.string.isRequired,
+		token: PropTypes.string.isRequired,
+		username: PropTypes.string.isRequired,
+	}).isRequired,
+};
