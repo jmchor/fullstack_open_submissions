@@ -55,21 +55,21 @@ const Blog = ({ blog, updateLikes, updateBlogsAfterDeletion, user }) => {
 
 	return (
 		<div style={blogStyle}>
-			<p>
-				‚{blog.title} by {blog.author}
+			<p data-testid='blogtest'>
+				{blog.title} by {blog.author}
 			</p>
 			<button type='button' onClick={toggleBlog}>
 				{isBlogShown ? 'Hide' : 'Show'}
 			</button>
 			{isBlogShown && (
 				<div>
-					<p>Source: {blog?.url}</p>
-					<p>
+					<p id='url'>Source: {blog?.url}</p>
+					<p id='likes'>
 						Likes {likes || blog.likes} <button onClick={increaseLikes}>Like</button>
 					</p>
 					<p>Created By: {blog?.user?.username}</p>
 
-					{blog?.user?.username === user.username ? (
+					{blog?.user?.username === user?.username ? (
 						<button type='button' onClick={() => deleteBlog(blog.id)}>
 							Remove
 						</button>

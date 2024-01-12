@@ -72,9 +72,20 @@ const App = () => {
 		setUser('');
 	};
 
+	const headlineStyles = {
+		display: 'flex',
+		justifyContent: 'center',
+	};
+
+	const imageStyles = {
+		width: '100px',
+	};
 	return (
 		<div className='App'>
-			<h2>blogs</h2>
+			<div style={headlineStyles}>
+				<img style={imageStyles} src='/blog.svg' alt='' />
+				<h2>blogs</h2>
+			</div>
 			<Notification errorMessage={errorMessage} successMessage={successMessage} />
 
 			{!user ? (
