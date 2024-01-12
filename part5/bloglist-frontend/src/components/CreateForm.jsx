@@ -28,7 +28,6 @@ const CreateForm = ({ create, setSuccessMessage, setErrorMessage, setBlogs, blog
 			setAuthor('');
 			setUrl('');
 		} catch (error) {
-			console.error('Error creating blog:', error.message);
 			setErrorMessage('Failed to create a new blog');
 			setTimeout(() => {
 				setErrorMessage(null);

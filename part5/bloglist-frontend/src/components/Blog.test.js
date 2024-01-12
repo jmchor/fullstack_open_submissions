@@ -7,28 +7,28 @@ import axios from 'axios';
 
 jest.mock('axios');
 
+const blogUser = {
+	username: 'asdjasdj',
+	id: '659d53f65c0cbaafb432cd17',
+	name: 'Jalapeno',
+	token: 'token',
+	blogs: [],
+};
 const blog = {
 	title: 'BlogTest with Jest',
 	author: 'jmchor',
 	url: 'www.google.mo',
 	likes: 2024,
-	user: user,
+	user: blogUser,
 	id: '9rb0eac585b0921fc47bc329',
 };
 
 const updateLikes = jest.fn();
 const updateBlogsAfterDeletion = jest.fn();
 
-const user = {
-	username: 'asdjasdj',
-	id: '659d53f65c0cbaafb432cd17',
-	name: 'Jalapeno',
-	token: 'token',
-};
-
 test('renders content', () => {
 	render(
-		<Blog blog={blog} updateBlogsAfterDeletion={updateBlogsAfterDeletion} updateLikes={updateLikes} user={user} />
+		<Blog blog={blog} updateBlogsAfterDeletion={updateBlogsAfterDeletion} updateLikes={updateLikes} user={blogUser} />
 	);
 
 	const element = screen.getByTestId('blogtest');
@@ -36,7 +36,7 @@ test('renders content', () => {
 
 test('shows details on button click', async () => {
 	const { container } = render(
-		<Blog blog={blog} updateBlogsAfterDeletion={updateBlogsAfterDeletion} updateLikes={updateLikes} user={user} />
+		<Blog blog={blog} updateBlogsAfterDeletion={updateBlogsAfterDeletion} updateLikes={updateLikes} user={blogUser} />
 	);
 
 	const user = userEvent.setup();
@@ -56,7 +56,7 @@ test('clicking the like button works', async () => {
 	const mockHandler = jest.fn();
 
 	const component = render(
-		<Blog blog={blog} updateLikes={mockHandler} updateBlogsAfterDeletion={updateBlogsAfterDeletion} user={user} />
+		<Blog blog={blog} updateLikes={mockHandler} updateBlogsAfterDeletion={updateBlogsAfterDeletion} user={blogUser} />
 	);
 	const user = userEvent.setup();
 
