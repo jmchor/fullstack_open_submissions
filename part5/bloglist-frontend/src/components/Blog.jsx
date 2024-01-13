@@ -54,23 +54,26 @@ const Blog = ({ blog, updateLikes, updateBlogsAfterDeletion, user }) => {
 	};
 
 	return (
-		<div style={blogStyle}>
+		<div className='themBlogs' style={blogStyle}>
 			<p data-testid='blogtest'>
 				{blog.title} by {blog.author}
 			</p>
-			<button type='button' onClick={toggleBlog}>
+			<button id='toggleShow' type='button' onClick={toggleBlog}>
 				{isBlogShown ? 'Hide' : 'Show'}
 			</button>
 			{isBlogShown && (
 				<div>
 					<p id='url'>Source: {blog?.url}</p>
 					<p id='likes'>
-						Likes {likes || blog.likes} <button onClick={increaseLikes}>Like</button>
+						Likes {likes || blog.likes}{' '}
+						<button id='like-button' onClick={increaseLikes}>
+							Like
+						</button>
 					</p>
-					<p>Created By: {blog?.user?.username}</p>
+					<p id='createdBy'>Created By: {blog?.user?.username}</p>
 
 					{blog?.user?.username === user?.username ? (
-						<button type='button' onClick={() => deleteBlog(blog.id)}>
+						<button id='deleteButton' type='button' onClick={() => deleteBlog(blog.id)}>
 							Remove
 						</button>
 					) : (

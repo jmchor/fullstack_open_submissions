@@ -25,7 +25,9 @@ const Notification = ({ errorMessage, successMessage }) => {
 			{!errorMessage && successMessage ? (
 				<div style={successStyles}>{successMessage}</div>
 			) : (
-				<div style={errorStyles}>{errorMessage}</div>
+				<div className='error' style={errorStyles}>
+					{errorMessage}
+				</div>
 			)}
 		</>
 	);

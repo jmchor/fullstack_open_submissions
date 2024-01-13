@@ -8,7 +8,9 @@ const LoginForm = ({ handleLogin, handleUsernameChange, handlePasswordChange, us
 			<label htmlFor='password'>password</label>
 			<input type='password' name='password' id='password' value={password} onChange={handlePasswordChange} />
 
-			<button type='submit'>login</button>
+			<button id='login-button' type='submit'>
+				login
+			</button>
 		</form>
 	);
 };
