@@ -103,12 +103,12 @@ describe('blog app', function () {
 			});
 		});
 
-		it.only('Removing the blog', function () {
+		it('Removing the blog', function () {
 			cy.contains('Swordfish blog by Swordfish').parent().find('button').should('contain', 'Show').click();
 			cy.contains('Swordfish blog by Swordfish').parent().parent().find('button').should('not.contain', 'remove');
 		});
 
-		it.only('blogs are in descending order by likes', function () {
+		it('blogs are in descending order by likes', function () {
 			cy.contains('Swordfish blog by Swordfish').parent().find('button').should('contain', 'Show').click();
 			cy.get('#like-button');
 			cy.get('.themBlogs').eq(0).should('contain', 'Swordfish blog by Swordfish');
