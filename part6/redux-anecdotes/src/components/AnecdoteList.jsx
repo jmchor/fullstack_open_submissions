@@ -1,6 +1,6 @@
-import { increaseVoteOf } from '../reducers/anecdoteReducer';
+import { updateAnecdoteVote } from '../reducers/anecdoteReducer';
 import { useDispatch, useSelector } from 'react-redux';
-import { showNotification, hideNotification } from '../reducers/notificationReducer';
+import { timedNotification } from '../reducers/notificationReducer.js';
 
 const AnecdoteList = () => {
 	//thanks to the combined reducer, the destructured anecdotes and filter here refer to the state which is provided by the anecdote reducer and the filter reducer
@@ -14,12 +14,8 @@ const AnecdoteList = () => {
 		const votedAnecdote = anecdotes.find((anecdote) => anecdote.id === id);
 
 		if (votedAnecdote) {
-			dispatch(increaseVoteOf(id));
-			dispatch(showNotification(`Voted for anecdote: ${votedAnecdote.content}`));
-
-			setTimeout(() => {
-				dispatch(hideNotification());
-			}, 5000);
+			dispatch(updateAnecdoteVote(votedAnecdote));
+			dispatch(timedNotification(`You voted for ${votedAnecdote.content}`, 5));
 		}
 	};
 	return (
