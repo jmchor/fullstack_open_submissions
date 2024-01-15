@@ -1,3 +1,5 @@
+import { createSlice } from '@reduxjs/toolkit';
+
 const anecdotesAtStart = [
 	'If it hurts, do it more often',
 	'Adding manpower to a late software project makes it later!',
@@ -17,46 +19,76 @@ const asObject = (anecdote) => {
 	};
 };
 
-export const createAnecdote = (content) => {
-	return {
-		type: 'CREATE_ANECDOTE',
-		payload: {
-			content,
-			id: getId(),
-			votes: 0,
-		},
-	};
-};
-
-export const increaseVoteOf = (id) => {
-	return {
-		type: 'INCREASE_VOTE',
-		payload: {
-			id,
-		},
-	};
-};
-
 const initialState = anecdotesAtStart.map(asObject);
 
-const reducer = (state = initialState, action) => {
-	console.log('action', action);
-	console.log('state now: ', state);
+const anecdoteSlice = createSlice({
+	name: 'anecdotes',
+	initialState,
+	reducers: {
+		createAnecdote(state, action) {
+			const content = action.payload;
+			state.push({
+				content,
+				id: getId(),
+				votes: 0,
+			});
+		},
+		increaseVoteOf(state, action) {
+			const id = action.payload;
+			const anecdoteToUpvote = state.find((anecdote) => anecdote.id === id);
+			const updatedAnecdote = {
+				...anecdoteToUpvote,
+				votes: anecdoteToUpvote.votes + 1,
+			};
 
-	switch (action.type) {
-		//increase vote for a single anecdote using the action creator
-		case 'INCREASE_VOTE':
-			//we need to single out the anecdote we clicked on by comparing IDs
-			return state.map((anecdote) =>
-				//if the ID of an anecdote in the whole array matches the one from the payload
-				//we spread the anecdotes into an object and only alter the votes key
-				anecdote.id === action.payload.id ? { ...anecdote, votes: anecdote.votes + 1 } : anecdote
-			);
-		case 'CREATE_ANECDOTE':
-			return [...state, action.payload];
-		default:
-			return state;
-	}
-};
+			return state.map((anecdote) => (anecdote.id !== id ? anecdote : updatedAnecdote));
+		},
+	},
+});
 
-export default reducer;
+export const { createAnecdote, increaseVoteOf } = anecdoteSlice.actions;
+export default anecdoteSlice.reducer;
+
+//Old style:
+
+// export const createAnecdote = (content) => {
+// 	return {
+// 		type: 'CREATE_ANECDOTE',
+// 		payload: {
+// 			content,
+// 			id: getId(),
+// 			votes: 0,
+// 		},
+// 	};
+// };
+
+// export const increaseVoteOf = (id) => {
+// 	return {
+// 		type: 'INCREASE_VOTE',
+// 		payload: {
+// 			id,
+// 		},
+// 	};
+// };
+
+// const reducer = (state = initialState, action) => {
+// 	console.log('action', action);
+// 	console.log('state now: ', state);
+
+// 	switch (action.type) {
+// 		//increase vote for a single anecdote using the action creator
+// 		case 'INCREASE_VOTE':
+// 			//we need to single out the anecdote we clicked on by comparing IDs
+// 			return state.map((anecdote) =>
+// 				//if the ID of an anecdote in the whole array matches the one from the payload
+// 				//we spread the anecdotes into an object and only alter the votes key
+// 				anecdote.id === action.payload.id ? { ...anecdote, votes: anecdote.votes + 1 } : anecdote
+// 			);
+// 		case 'CREATE_ANECDOTE':
+// 			return [...state, action.payload];
+// 		default:
+// 			return state;
+// 	}
+// };
+
+// export default reducer;
