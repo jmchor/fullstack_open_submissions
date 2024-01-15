@@ -2,8 +2,10 @@ import { increaseVoteOf } from '../reducers/anecdoteReducer';
 import { useDispatch, useSelector } from 'react-redux';
 
 const AnecdoteList = () => {
-	// the Selector function returns the whole state but sorted by votes
-	const anecdotes = useSelector((state) => [...state].sort((a, b) => b.votes - a.votes));
+	//thanks to the combined reducer, the destructured anecdotes and filter here refer to the state which is provided by the anecdote reducer and the filter reducer
+	const anecdotes = useSelector(({ anecdotes, filter }) =>
+		anecdotes.filter((anecdote) => anecdote.content.toLowerCase().includes(filter)).sort((a, b) => b.votes - a.votes)
+	);
 	const dispatch = useDispatch();
 
 	const vote = (id) => {
