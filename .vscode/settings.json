@@ -18,6 +18,5 @@
 		"titleBar.inactiveBackground": "#a160a299",
 		"titleBar.inactiveForeground": "#e7e7e799"
 	},
-	"peacock.color": "#a160a2",
-	"eslint.workingDirectories": ["../part0", "../part1", "../part2", "../part4", "../part5", "../part6", "../part9"]
+	"peacock.color": "#a160a2"
 }
