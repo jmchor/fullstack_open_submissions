@@ -1,4 +1,4 @@
-interface exerciseResult {
+export interface exerciseResult {
 	periodLength: number;
 	trainingDays: number;
 	success: boolean;
@@ -8,7 +8,7 @@ interface exerciseResult {
 	average: number;
 }
 
-interface InputValues {
+export interface InputValues {
 	target: number;
 	dailyExerciseHours: number[];
 }
@@ -38,7 +38,7 @@ const parseExerciseArguments = (args: string[]): InputValues => {
 	};
 };
 
-const calculateExercises = (target: number, dailyExerciseHours: number[]): exerciseResult => {
+export const calculateExercises = (target: number, dailyExerciseHours: number[]): exerciseResult => {
 	if (!dailyExerciseHours.every((item) => !isNaN(Number(item)))) {
 		throw new Error('All items in the array must be numbers');
 	}

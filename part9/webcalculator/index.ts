@@ -1,7 +1,9 @@
 import express from 'express';
 import { calculateBmi } from './bmiCalculator';
+import { calculateExercises } from './exerciseCalculator';
 
 const app = express();
+app.use(express.json());
 
 interface bmiResponse {
 	weight: number;
@@ -36,6 +38,21 @@ app.get('/bmi', (req, res) => {
 			res.status(400).json({ error: error.message });
 		}
 	}
+});
+
+app.post('/exercises', (req, res) => {
+	const { target, daily_exercises }: { target: number; daily_exercises: number[] } = req.body;
+
+	if (isNaN(target) || !Array.isArray(daily_exercises)) {
+		res.status(400).json({ error: 'malformatted parameters' });
+	}
+
+	if (!target || !daily_exercises) {
+		res.status(400).json({ error: 'parameters missing' });
+	}
+
+	const result = calculateExercises(target, daily_exercises);
+	res.status(200).json(result);
 });
 
 const PORT = 3003;
