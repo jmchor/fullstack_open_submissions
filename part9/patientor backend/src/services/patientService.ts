@@ -1,5 +1,6 @@
 import patientData from '../../data/patients';
-import { NonSensitiveEntries, PatientData } from '../types';
+import { NonSensitiveEntries, PatientData, NewPatientInfo } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
 const patientDataArray: PatientData[] = patientData;
 
@@ -17,12 +18,25 @@ const getNonSensitiveEntries = (): NonSensitiveEntries[] => {
 	}));
 };
 
-const addEntry = () => {
-	return null;
+const addPatient = (patient: NewPatientInfo): PatientData => {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+	const id: string = uuidv4();
+
+	const newPatient = {
+		id,
+		...patient,
+	};
+	return newPatient;
+};
+
+const findById = (id: string): PatientData | undefined => {
+	const patient = patientDataArray.find((p) => p.id === id);
+	return patient;
 };
 
 export default {
 	getEntries,
-	addEntry,
+	addPatient,
 	getNonSensitiveEntries,
+	findById,
 };
