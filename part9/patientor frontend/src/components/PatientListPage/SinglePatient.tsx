@@ -6,6 +6,7 @@ import patientService from '../../services/patients';
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
+import Entry from './Entry';
 
 const SinglePatient = () => {
 	const { id } = useParams<IdParams>();
@@ -38,6 +39,8 @@ const SinglePatient = () => {
 			</div>
 			<p>SSN: {singlePatient.ssn}</p>
 			<p>Occupation: {singlePatient.occupation}</p>
+			<h3>entries</h3>
+			{singlePatient.entries && singlePatient.entries.map((entry) => <Entry key={entry.id} entry={entry} />)}
 		</div>
 	);
 };

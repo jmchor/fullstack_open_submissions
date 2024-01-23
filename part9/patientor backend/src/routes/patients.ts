@@ -1,19 +1,19 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import { PatientData, NonSensitivePatient } from '../types';
+import { Patient } from '../types';
 import toNewPatientEntry from '../utils';
 
 const router = express.Router();
 
 router.get('/', (_req, res) => {
-	const entries: NonSensitivePatient[] = patientService.getNonSensitiveEntries();
+	const entries: Patient[] = patientService.getEntries();
 	res.json(entries);
 });
 
 router.get('/:id', (req, res) => {
 	const { id } = req.params;
 
-	const patient = patientService.findById(id) as PatientData;
+	const patient = patientService.findById(id) as Patient;
 
 	try {
 		res.json(patient);
@@ -31,7 +31,7 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
 	try {
 		const newPatientEntry = toNewPatientEntry(req.body);
-		const newPatient: PatientData = patientService.addPatient(newPatientEntry);
+		const newPatient: Patient = patientService.addPatient(newPatientEntry);
 		res.json(newPatient);
 	} catch (error) {
 		if (error instanceof Error) {
