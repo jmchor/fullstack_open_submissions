@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.get('/', (_req, res) => {
 	const entries: NonSensitivePatient[] = patientService.getNonSensitiveEntries();
-	console.log(entries);
 	res.json(entries);
 });
 
