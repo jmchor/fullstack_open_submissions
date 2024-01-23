@@ -1,6 +1,6 @@
-import { Entry, assertNever } from '../../types';
+import { Diagnosis, Entry, assertNever } from '../../types';
 
-const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
+const EntryDetails = ({ entry, diagnoses }: { entry: Entry; diagnoses: Diagnosis[] }) => {
 	switch (entry.type) {
 		case 'Hospital':
 			return (
@@ -8,7 +8,14 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
 					<p>
 						{entry.date} <i>{entry.description}</i>
 					</p>
-					<ul>{entry?.diagnosisCodes && entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)}</ul>
+					<ul>
+						{entry?.diagnosisCodes &&
+							entry.diagnosisCodes.map((code) => {
+								const matchingDiagnosis = diagnoses.find((diagnosis) => diagnosis.code === code);
+								return <li key={code}>{matchingDiagnosis ? `${code}: ${matchingDiagnosis.name}` : code}</li>;
+							})}
+					</ul>
+
 					{entry.discharge && (
 						<div>
 							<p>Discharged on {entry.discharge.date}</p>
@@ -28,7 +35,13 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
 						{entry.date} <i>{entry.description}</i>
 					</p>
 					<p>Employer: {entry.employerName}</p>
-					<ul>{entry?.diagnosisCodes && entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)}</ul>
+					<ul>
+						{entry?.diagnosisCodes &&
+							entry.diagnosisCodes.map((code) => {
+								const matchingDiagnosis = diagnoses.find((diagnosis) => diagnosis.code === code);
+								return <li key={code}>{matchingDiagnosis ? `${code}: ${matchingDiagnosis.name}` : code}</li>;
+							})}
+					</ul>
 					<p>
 						Sick leave from {entry.sickLeave.startDate} to {entry.sickLeave.endDate}
 					</p>
@@ -44,7 +57,13 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
 					<p>
 						{entry.date} <i>{entry.description}</i>
 					</p>
-					<ul>{entry?.diagnosisCodes && entry.diagnosisCodes.map((code) => <li key={code}>{code}</li>)}</ul>
+					<ul>
+						{entry?.diagnosisCodes &&
+							entry.diagnosisCodes.map((code) => {
+								const matchingDiagnosis = diagnoses.find((diagnosis) => diagnosis.code === code);
+								return <li key={code}>{matchingDiagnosis ? `${code}: ${matchingDiagnosis.name}` : code}</li>;
+							})}
+					</ul>
 					<p>Healthcheck Rating: {entry.healthCheckRating}</p>
 					<p>
 						Diagnosis by <b>{entry.specialist}</b>
