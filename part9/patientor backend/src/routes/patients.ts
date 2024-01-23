@@ -1,7 +1,8 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import { Patient } from '../types';
-import toNewPatientEntry from '../utils';
+import { Entry, Patient } from '../types';
+import diagnosesService from '../services/diagnosesService';
+import { toNewDiagnosticEntry, toNewPatientEntry } from '../utils';
 
 const router = express.Router();
 
@@ -33,13 +34,27 @@ router.post('/', (req, res) => {
 		const newPatientEntry = toNewPatientEntry(req.body);
 		const newPatient: Patient = patientService.addPatient(newPatientEntry);
 		res.json(newPatient);
-	} catch (error) {
+	} catch (error: unknown) {
 		if (error instanceof Error) {
 			// Handle errors thrown by utility functions
 			res.status(400).json({ error: error.message });
 		} else {
 			// Handle other types of errors
 			res.status(500).json({ error: 'Internal Server Error' });
+		}
+	}
+});
+
+router.post('/:id/entries', (req, res) => {
+	try {
+		const newDiagnosticEntry = toNewDiagnosticEntry(req.body);
+		const newEntry: Entry = diagnosesService.addEntry(newDiagnosticEntry);
+		res.json(newEntry);
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			res.status(400).json({ error: error.message });
+		} else {
+			res.status(400).json({ error: 'Unknown error occurred' });
 		}
 	}
 });

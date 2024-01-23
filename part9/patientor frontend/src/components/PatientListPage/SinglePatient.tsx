@@ -7,6 +7,7 @@ import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import Entry from './Entry';
+import EntryForm from './EntryForm';
 
 const SinglePatient = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
 	const { id } = useParams<IdParams>();
@@ -34,6 +35,7 @@ const SinglePatient = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
 
 	return (
 		<div>
+			<EntryForm diagnoses={diagnoses} />
 			<div>
 				<h1> {singlePatient.name}</h1> {getGenderIcon()}
 			</div>
