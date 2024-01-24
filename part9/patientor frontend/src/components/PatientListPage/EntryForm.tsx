@@ -1,21 +1,44 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
+import patientService from '../../services/patients';
 import { Diagnosis, EntryWithoutId, HealthCheckEntry, HospitalEntry, OccupationalHealthcareEntry } from '../../types';
+import { AxiosError } from 'axios';
 
-const EntryForm = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
+import {
+	Button,
+	FormControl,
+	InputLabel,
+	MenuItem,
+	Select,
+	TextField,
+	Radio,
+	RadioGroup,
+	FormControlLabel,
+	FormLabel,
+	Checkbox,
+	FormGroup,
+	CardContent,
+	Card,
+} from '@mui/material';
+
+const EntryForm = ({ diagnoses, patientID }: { diagnoses: Diagnosis[]; patientID: string }) => {
+	const today = new Date();
+	const formattedToday = today.toISOString().split('T')[0];
+
 	const [description, setDescription] = useState('');
 	const [specialist, setSpecialist] = useState('');
-	const [date, setDate] = useState('');
-	const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
+	const [date, setDate] = useState<string>(formattedToday);
+	const [diagnosisCodes, setDiagnosisCodes] = useState<Array<Diagnosis['code']>>([]);
 	const [entryType, setEntryType] = useState<string>('');
 	const [employerName, setEmployerName] = useState<string>('');
-	const [sickLeaveStart, setSickLeaveStart] = useState<string>('');
-	const [sickLeaveEnd, setSickLeaveEnd] = useState<string>('');
-	const [dischargeDate, setDischargeDate] = useState<string>('');
+	const [sickLeaveStart, setSickLeaveStart] = useState<string>(formattedToday);
+	const [sickLeaveEnd, setSickLeaveEnd] = useState<string>(formattedToday);
+	const [dischargeDate, setDischargeDate] = useState<string>(formattedToday);
 	const [criteria, setCriteria] = useState<string>('');
 	const [healthCheckRating, setHealthCheckRating] = useState<number>(0);
+	const [errorMessage, setErrorMessage] = useState<string>('');
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (e: React.SyntheticEvent) => {
+		e.preventDefault();
 		let entryData: EntryWithoutId | undefined = undefined;
 
 		switch (entryType) {
@@ -28,7 +51,8 @@ const EntryForm = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
 					diagnosisCodes,
 					employerName,
 					sickLeave: { startDate: sickLeaveStart, endDate: sickLeaveEnd },
-				};
+				} as OccupationalHealthcareEntry;
+				console.log('ENTRYDATA', entryData);
 				break;
 
 			case 'Hospital':
@@ -39,7 +63,8 @@ const EntryForm = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
 					date,
 					diagnosisCodes,
 					discharge: { date: dischargeDate, criteria },
-				};
+				} as HospitalEntry;
+				console.log('ENTRYDATA', entryData);
 				break;
 
 			case 'HealthCheck':
@@ -49,7 +74,8 @@ const EntryForm = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
 					date,
 					specialist,
 					healthCheckRating,
-				};
+				} as HealthCheckEntry;
+				console.log('ENTRYDATA', entryData);
 				break;
 
 			default:
@@ -57,106 +83,174 @@ const EntryForm = ({ diagnoses }: { diagnoses: Diagnosis[] }) => {
 		}
 
 		try {
-			const response = await axios.post('your_api_endpoint_here', entryData);
-			console.log('Form submitted successfully!', response.data);
+			const addEntry = await patientService.addEntry(entryData as EntryWithoutId, patientID);
+			console.log(addEntry);
+			setErrorMessage('');
 			// Handle success, redirect, or update UI as needed
-		} catch (error) {
-			console.error('Error submitting form:', error);
+			void window.location.reload();
+		} catch (error: unknown) {
+			if (error instanceof AxiosError) {
+				const errorMessage = error.response?.data;
+				if (errorMessage) {
+					setErrorMessage(errorMessage);
+				}
+			}
 			// Handle error, display error message, etc.
 		}
 	};
 
+	const errorStyles: React.CSSProperties = {
+		color: 'red',
+		border: '2px solid red',
+		backgroundColor: '#d3d3d3',
+		fontSize: '1.2em',
+		padding: '15px 10px',
+	};
+
 	return (
-		<div>
-			<label>Entry Type:</label>
-			<select value={entryType} onChange={(e) => setEntryType(e.target.value)}>
-				<option value=''>Select Entry Type</option>
-				<option value='OccupationalHealthcare'>Occupational Healthcare</option>
-				<option value='Hospital'>Hospital</option>
-				<option value='HealthCheck'>Health Check</option>
-			</select>
-
-			{(() => {
-				switch (entryType) {
-					case 'OccupationalHealthcare':
-						return (
-							<>
-								<label>Employer Name:</label>
-								<input type='text' value={employerName} onChange={(e) => setEmployerName(e.target.value)} />
-
-								<label>Sick Leave (Start Date):</label>
-								<input type='date' value={sickLeaveStart} onChange={(e) => setSickLeaveStart(e.target.value)} />
-
-								<label>Sick Leave (End Date):</label>
-								<input type='date' value={sickLeaveEnd} onChange={(e) => setSickLeaveEnd(e.target.value)} />
-							</>
-						);
-
-					case 'Hospital':
-						return (
-							<>
-								<label>Discharge Date:</label>
-								<input type='date' value={dischargeDate} onChange={(e) => setDischargeDate(e.target.value)} />
-
-								<label>Criteria:</label>
-								<input type='text' value={criteria} onChange={(e) => setCriteria(e.target.value)} />
-							</>
-						);
-
-					case 'HealthCheck':
-						return (
-							<>
-								<label>Health Check Rating:</label>
-								<div>
-									{[1, 2, 3, 4].map((rating) => (
-										<label key={rating}>
-											<input
-												type='radio'
-												value={rating}
-												checked={healthCheckRating === rating}
-												onChange={() => setHealthCheckRating(rating)}
-											/>
-											{rating}
-										</label>
-									))}
-								</div>
-							</>
-						);
-
-					default:
-						return null;
-				}
-			})()}
-			<label>Description:</label>
-			<input type='text' value={description} onChange={(e) => setDescription(e.target.value)} />
-
-			<label>Specialist:</label>
-			<input type='text' value={specialist} onChange={(e) => setSpecialist(e.target.value)} />
-
-			<label>Date:</label>
-			<input type='date' value={date} onChange={(e) => setDate(e.target.value)} />
-
-			<label>Diagnosis Codes (Select multiple):</label>
-			{diagnoses.map((item) => (
-				<div key={item.code}>
-					<input
-						type='checkbox'
-						id={item.code}
-						value={item.code}
-						checked={diagnosisCodes.includes(item.code)}
-						onChange={() => {
-							const updatedCodes = diagnosisCodes.includes(item.code)
-								? diagnosisCodes.filter((code) => code !== item.code)
-								: [...diagnosisCodes, item.code];
-							setDiagnosisCodes(updatedCodes);
-						}}
+		<Card>
+			<CardContent>
+				{errorMessage && <p style={errorStyles}>{errorMessage}</p>}
+				<form onSubmit={handleSubmit}>
+					<FormControl fullWidth margin='normal'>
+						<InputLabel htmlFor='entry-type'>Entry Type</InputLabel>
+						<Select label='Entry Type' id='entry-type' value={entryType} onChange={(e) => setEntryType(e.target.value)}>
+							<MenuItem value=''>Select Entry Type</MenuItem>
+							<MenuItem value='OccupationalHealthcare'>Occupational Healthcare</MenuItem>
+							<MenuItem value='Hospital'>Hospital</MenuItem>
+							<MenuItem value='HealthCheck'>Health Check</MenuItem>
+						</Select>
+					</FormControl>
+					{(() => {
+						switch (entryType) {
+							case 'OccupationalHealthcare':
+								return (
+									<>
+										<TextField
+											label='Employer Name'
+											fullWidth
+											margin='normal'
+											value={employerName}
+											onChange={(e) => setEmployerName(e.target.value)}
+										/>
+										<TextField
+											type='date'
+											label='Sick Leave (Start Date)'
+											fullWidth
+											value={sickLeaveStart}
+											onChange={(e) => setSickLeaveStart(e.target.value)}
+										/>
+										<TextField
+											type='date'
+											label='Sick Leave (End Date)'
+											fullWidth
+											margin='normal'
+											value={sickLeaveEnd}
+											onChange={(e) => setSickLeaveEnd(e.target.value)}
+										/>
+									</>
+								);
+							case 'Hospital':
+								return (
+									<>
+										<TextField
+											type='date'
+											label='Discharge Date'
+											fullWidth
+											margin='normal'
+											value={dischargeDate}
+											onChange={(e) => setDischargeDate(e.target.value)}
+										/>
+										<TextField
+											label='Criteria'
+											fullWidth
+											margin='normal'
+											value={criteria}
+											onChange={(e) => setCriteria(e.target.value)}
+										/>
+									</>
+								);
+							case 'HealthCheck':
+								return (
+									<>
+										<FormControl component='fieldset' fullWidth margin='normal'>
+											<FormLabel component='legend'>Health Check Rating</FormLabel>
+											<RadioGroup
+												aria-label='healthCheckRating'
+												name='healthCheckRating'
+												value={healthCheckRating.toString()}
+												onChange={(e) => setHealthCheckRating(Number(e.target.value))}
+											>
+												{[1, 2, 3, 4].map((rating) => (
+													<FormControlLabel
+														key={rating}
+														value={rating.toString()}
+														control={<Radio />}
+														label={rating.toString()}
+													/>
+												))}
+											</RadioGroup>
+										</FormControl>
+									</>
+								);
+							default:
+								return null;
+						}
+					})()}
+					<TextField
+						label='Description'
+						fullWidth
+						margin='normal'
+						value={description}
+						onChange={(e) => setDescription(e.target.value)}
 					/>
-					<label htmlFor={item.code}>{item.name}</label>
-				</div>
-			))}
-
-			<button onClick={handleSubmit}>Submit</button>
-		</div>
+					<TextField
+						label='Specialist'
+						fullWidth
+						margin='normal'
+						value={specialist}
+						onChange={(e) => setSpecialist(e.target.value)}
+					/>
+					<TextField
+						type='date'
+						label='Date'
+						fullWidth
+						margin='normal'
+						value={date}
+						onChange={(e) => setDate(e.target.value)}
+					/>
+					{entryType !== 'HealthCheck' && (
+						<div>
+							<FormControl component='fieldset'>
+								<FormLabel component='legend'>Diagnosis Codes (Select multiple)</FormLabel>
+								<FormGroup>
+									{diagnoses.map((item) => (
+										<FormControlLabel
+											key={item.code}
+											control={
+												<Checkbox
+													checked={diagnosisCodes.includes(item.code)}
+													onChange={() => {
+														const updatedCodes = diagnosisCodes.includes(item.code)
+															? diagnosisCodes.filter((code) => code !== item.code)
+															: [...diagnosisCodes, item.code];
+														setDiagnosisCodes(updatedCodes);
+													}}
+												/>
+											}
+											label={item.name}
+										/>
+									))}
+								</FormGroup>
+							</FormControl>
+						</div>
+					)}
+					<Button type='submit' variant='contained' color='primary'>
+						Submit
+					</Button>
+				</form>
+			</CardContent>
+		</Card>
 	);
 };
 

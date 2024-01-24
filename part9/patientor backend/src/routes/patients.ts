@@ -2,7 +2,8 @@ import express from 'express';
 import patientService from '../services/patientService';
 import { Entry, Patient } from '../types';
 import diagnosesService from '../services/diagnosesService';
-import { toNewDiagnosticEntry, toNewPatientEntry } from '../utils';
+import toNewPatientEntry from '../utils/toNewPatient';
+import toNewDiagnosticEntry from '../utils/toNewEntry';
 
 const router = express.Router();
 
@@ -46,16 +47,28 @@ router.post('/', (req, res) => {
 });
 
 router.post('/:id/entries', (req, res) => {
+	const { id } = req.params;
+
+	console.log(id);
+
 	try {
+		const patient = patientService.findById(id);
+		if (patient === undefined) {
+			res.status(404).send(`patient not found`);
+			return;
+		}
+
 		const newDiagnosticEntry = toNewDiagnosticEntry(req.body);
-		const newEntry: Entry = diagnosesService.addEntry(newDiagnosticEntry);
+
+		const newEntry: Entry = diagnosesService.addEntry(newDiagnosticEntry, patient);
+
 		res.json(newEntry);
 	} catch (error: unknown) {
+		let errorMessage = 'Something went wrong';
 		if (error instanceof Error) {
-			res.status(400).json({ error: error.message });
-		} else {
-			res.status(400).json({ error: 'Unknown error occurred' });
+			errorMessage += ' Error: ' + error.message;
 		}
+		res.status(400).send(errorMessage);
 	}
 });
 

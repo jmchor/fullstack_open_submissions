@@ -6,7 +6,10 @@ const EntryDetails = ({ entry, diagnoses }: { entry: Entry; diagnoses: Diagnosis
 			return (
 				<div>
 					<p>
-						{entry.date} <i>{entry.description}</i>
+						<b>Date: {entry.date}</b>
+						<br />
+						<br />
+						Description: <i>{entry.description}</i>
 					</p>
 					<ul>
 						{entry?.diagnosisCodes &&
@@ -19,7 +22,7 @@ const EntryDetails = ({ entry, diagnoses }: { entry: Entry; diagnoses: Diagnosis
 					{entry.discharge && (
 						<div>
 							<p>Discharged on {entry.discharge.date}</p>
-							<p>{entry.discharge.criteria}</p>
+							<p>Notes: {entry.discharge.criteria}</p>
 						</div>
 					)}
 					<p>
@@ -42,9 +45,13 @@ const EntryDetails = ({ entry, diagnoses }: { entry: Entry; diagnoses: Diagnosis
 								return <li key={code}>{matchingDiagnosis ? `${code}: ${matchingDiagnosis.name}` : code}</li>;
 							})}
 					</ul>
-					<p>
-						Sick leave from {entry.sickLeave.startDate} to {entry.sickLeave.endDate}
-					</p>
+
+					{entry.sickLeave && (
+						<p>
+							Sick leave from {entry?.sickLeave?.startDate} to {entry?.sickLeave?.endDate}
+						</p>
+					)}
+
 					<p>
 						Diagnosis by <b>{entry.specialist}</b>
 					</p>
