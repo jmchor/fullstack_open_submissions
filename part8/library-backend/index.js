@@ -198,12 +198,24 @@ const resolvers = {
 			}
 		},
 
-		allBooks: async (obj, args) => {
+		allBooks: async (obj, { genre }) => {
 			try {
-				return await Book.find({}).populate('author');
+				let filter = {};
+				console.log(genre);
+				if (genre) {
+					filter = { genres: { $in: [genre] } };
+				}
+
+				return await Book.find(filter).populate('author');
 			} catch (error) {
 				console.error('Error fetching all books:', error);
-				throw new GraphQLError('Could not fetch all books. Please try again later.');
+				throw new GraphQLError('Could not fetch all books.', {
+					extensions: {
+						code: 'INVALID_GENRE',
+						invalidArgs: genre,
+						error,
+					},
+				});
 			}
 		},
 		allAuthors: async () => {

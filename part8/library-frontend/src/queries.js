@@ -11,8 +11,8 @@ export const ALL_AUTHORS = gql`
 `;
 
 export const ALL_BOOKS = gql`
-	query AllBooks {
-		allBooks {
+	query AllBooks($genreToSearch: String) {
+		allBooks(genre: $genreToSearch) {
 			author {
 				name
 				born
@@ -20,6 +20,17 @@ export const ALL_BOOKS = gql`
 			}
 			published
 			title
+			genres
+		}
+	}
+`;
+
+export const CURRENT_USER = gql`
+	query me {
+		me {
+			username
+			id
+			favoriteGenre
 		}
 	}
 `;
