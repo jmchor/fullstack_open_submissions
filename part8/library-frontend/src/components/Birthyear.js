@@ -27,7 +27,7 @@ const Birthyear = ({ authors }) => {
 					<select id='authorSelect' value={selectedAuthor} onChange={(e) => setSelectedAuthor(e.target.value)}>
 						<option value=''>Select an author</option>
 						{authors.map((author) => (
-							<option key={author.id} value={author.name}>
+							<option key={author._id} value={author.name}>
 								{author.name}
 							</option>
 						))}

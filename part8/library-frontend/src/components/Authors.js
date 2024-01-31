@@ -9,6 +9,8 @@ const Authors = (props) => {
 	}
 	const authors = data?.allAuthors;
 
+	console.log(authors);
+
 	if (!props.show) {
 		return null;
 	}
