@@ -13,10 +13,9 @@ const App = () => {
 	const [page, setPage] = useState('authors');
 	const [token, setToken] = useState(null);
 	const [errorMessage, setErrorMessage] = useState(null);
-	const [user, setUser] = useState({});
 
 	const currentUser = useQuery(CURRENT_USER, {
-		pollInterval: 1000,
+		skip: !token,
 	});
 
 	const client = useApolloClient();
@@ -59,7 +58,7 @@ const App = () => {
 
 			<Books show={page === 'books'} />
 
-			<NewBook show={page === 'add'} setError={notify} />
+			<NewBook show={page === 'add'} setError={notify} user={currentUser} />
 
 			{currentUser && <Recommendation show={page === 'recommended'} user={currentUser} />}
 		</div>

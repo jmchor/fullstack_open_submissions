@@ -11,15 +11,26 @@ const NewBook = (props) => {
 	const [genres, setGenres] = useState([]);
 
 	const [addBook] = useMutation(ADD_BOOK, {
-		onError: (error) => {
-			const messages = error.graphQLErrors.map((e) => e.message).join('\n');
-			props.setError(messages);
-		},
 		update: (cache, response) => {
-			cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
+			cache.updateQuery({ query: ALL_BOOKS }, ({ allBooks }) => {
 				return {
-					allAuthors: allAuthors.concat(response.data.addBook),
+					allBooks: allBooks.concat(response.data.addBook),
 				};
+			});
+			cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {
+				const newBook = response.data.addBook;
+				const authorId = newBook.author._id;
+				const authorName = newBook.author.name;
+
+				const authorExists = allAuthors.some((author) => author._id === authorId);
+
+				if (!authorExists) {
+					return {
+						allAuthors: allAuthors.concat({ _id: authorId, name: authorName, born: null }),
+					};
+				}
+
+				return { allAuthors };
 			});
 		},
 	});
@@ -28,10 +39,10 @@ const NewBook = (props) => {
 		return null;
 	}
 
-	const submit = async (event) => {
+	const submit = (event) => {
 		event.preventDefault();
 
-		addBook({ variables: { title, author, published, genres } });
+		addBook({ variables: { title, author, published: parseInt(published), genres } });
 
 		setTitle('');
 		setPublished('');

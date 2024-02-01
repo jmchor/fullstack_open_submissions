@@ -16,7 +16,6 @@ export const ALL_BOOKS = gql`
 			author {
 				name
 				born
-				_id
 			}
 			published
 			title

@@ -122,7 +122,7 @@ type Author {
 	name: String!
 	born: Int
 	bookCount: Int
-	_id: String
+	_id: ID!
 }
 
 type Book {
@@ -201,12 +201,10 @@ const resolvers = {
 		allBooks: async (obj, { genre }) => {
 			try {
 				let filter = {};
-				console.log(genre);
 				if (genre) {
-					filter = { genres: { $in: [genre] } };
+					return await Book.find({ genres: { $in: [genre] } }).populate('author');
 				}
-
-				return await Book.find(filter).populate('author');
+				return await Book.find({}).populate('author');
 			} catch (error) {
 				console.error('Error fetching all books:', error);
 				throw new GraphQLError('Could not fetch all books.', {
@@ -249,16 +247,50 @@ const resolvers = {
 					},
 				});
 			}
+
+			const { title, author, published, genres } = args;
+			if (!title || typeof title !== 'string') {
+				throw new GraphQLError('Title must be a non-empty string', {
+					extensions: {
+						code: 'BAD_USER_INPUT',
+					},
+				});
+			}
+			if (!author || typeof author !== 'string') {
+				throw new GraphQLError('Author must be a non-empty string', {
+					extensions: {
+						code: 'BAD_USER_INPUT',
+					},
+				});
+			}
+			if (!published || typeof published !== 'number') {
+				throw new GraphQLError('Published must be a number', {
+					extensions: {
+						code: 'BAD_USER_INPUT',
+					},
+				});
+			}
+			if (!Array.isArray(genres) || !genres.every((genre) => typeof genre === 'string')) {
+				throw new GraphQLError('Genres must be a non-empty array of strings', {
+					extensions: {
+						code: 'BAD_USER_INPUT',
+					},
+				});
+			}
 			try {
+				console.log('AUTHOR?', args.author);
 				// Check if the author already exists
 				let existingAuthor = await Author.findOne({ name: args.author });
 				let authorId;
 				if (!existingAuthor) {
+					console.log('Creating new Author');
+
 					// If not, create a new author
 					const newAuthor = await Author.create({ name: args.author });
 					authorId = newAuthor._id; // Get the newly created author's ID
 				} else {
 					authorId = existingAuthor._id; // Get the existing author's ID
+					console.log(authorId);
 				}
 
 				const genresArray = Array.isArray(args.genres)
@@ -267,6 +299,8 @@ const resolvers = {
 							.split(',')
 							.map((genre) => genre.trim())
 					: args.genres.split(',').map((genre) => genre.trim());
+
+				console.log(genresArray);
 
 				const newBook = await Book.create({ ...args, author: authorId, genres: genresArray });
 				const result = await Book.findById(newBook._id).populate('author');
