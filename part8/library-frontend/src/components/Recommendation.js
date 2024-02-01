@@ -1,13 +1,15 @@
-import { ALL_BOOKS, CURRENT_USER } from '../queries';
+import { ALL_BOOKS, CURRENT_USER } from '../gql/queries';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { useState, useEffect } from 'react';
 
 const Recommendation = ({ show, user }) => {
 	const [genreToSearch, setGenreToSearch] = useState({});
 
+	console.log(user);
+
 	useEffect(() => {
-		if (user.data && user.data) {
-			setGenreToSearch(user.data.me.favoriteGenre);
+		if (user.data && user.data.me) {
+			setGenreToSearch(user?.data?.me?.favoriteGenre);
 			console.log(genreToSearch);
 		}
 	}, [user, genreToSearch]);

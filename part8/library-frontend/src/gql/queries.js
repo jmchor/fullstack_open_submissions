@@ -33,3 +33,18 @@ export const CURRENT_USER = gql`
 		}
 	}
 `;
+
+export const BOOK_ADDED = gql`
+	subscription {
+		bookAdded {
+			title
+			published
+			author {
+				name
+				_id
+				born
+			}
+			genres
+		}
+	}
+`;

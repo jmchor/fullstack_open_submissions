@@ -1,4 +1,4 @@
-import { ALL_AUTHORS } from '../queries';
+import { ALL_AUTHORS } from '../gql/queries';
 import { useQuery } from '@apollo/client';
 import Birthyear from './Birthyear';
 const Authors = (props) => {

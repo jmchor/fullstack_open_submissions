@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { EDIT_BIRTHYEAR } from '../mutations';
-import { ALL_AUTHORS } from '../queries';
+import { EDIT_BIRTHYEAR } from '../gql/mutations';
+import { ALL_AUTHORS } from '../gql/queries';
 
 const Birthyear = ({ authors }) => {
 	const [selectedAuthor, setSelectedAuthor] = useState('');

@@ -1,4 +1,4 @@
-import { ALL_BOOKS } from '../queries';
+import { ALL_BOOKS } from '../gql/queries';
 import { useQuery } from '@apollo/client';
 import { useState } from 'react';
 
@@ -15,17 +15,18 @@ const Books = (props) => {
 		return <div>loading ...</div>;
 	}
 
-	const books = data?.allBooks;
-	const genresArray = books.reduce((acc, book) => {
+	const genresArray = props.books.reduce((acc, book) => {
 		return acc.concat(book.genres);
 	}, []);
 	const uniqueGenresArray = [...new Set(genresArray)];
 
-	const filteredBooks = result?.data?.allBooks;
+	const filteredBooks = result?.data?.allBooks || props.books;
 
 	if (!props.show) {
 		return null;
 	}
+
+	console.log(filteredBooks);
 
 	return (
 		<div>
@@ -47,6 +48,7 @@ const Books = (props) => {
 					))}
 				</tbody>
 			</table>
+			<button onClick={(e) => setGenreToSearch({})}>Reset</button>
 
 			{uniqueGenresArray.map((genre) => (
 				<button key={genre} value={genre} onClick={(e) => setGenreToSearch(e.target.value)}>
